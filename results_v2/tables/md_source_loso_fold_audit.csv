@@ -1,0 +1,7 @@
+fold,held_source,train_rows,test_rows,test_active,test_inactive,train_sources,source_overlap
+0,LNP193,12,1,1,0,5,0
+1,LNP194,12,1,1,0,5,0
+2,LNP195,12,1,0,1,5,0
+3,LNP782,11,2,2,0,5,0
+4,LNP854,11,2,1,1,5,0
+5,LNP858,7,6,1,5,5,0

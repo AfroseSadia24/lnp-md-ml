@@ -1,0 +1,8 @@
+ionizable_lipid
+peg_lipid
+helper_lipid
+mixing_method
+buffer
+loading_capacity_std
+bio_administration_route
+ionizable_lipid_canonical_smiles

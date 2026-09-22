@@ -1,0 +1,264 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.dummy import DummyClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import average_precision_score, f1_score, matthews_corrcoef, roc_auc_score
+from sklearn.model_selection import GridSearchCV, GroupKFold, StratifiedGroupKFold, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from common import CorrelationFilter, set_seed, write_json
+
+
+def estimator_and_grid(name: str, seed: int, quick: bool):
+    if name == "majority":
+        return DummyClassifier(strategy="prior"), {}
+    if name == "logistic":
+        return LogisticRegression(max_iter=5000, class_weight="balanced", solver="liblinear", random_state=seed), {"model__C": [1.0] if quick else [0.01, 0.1, 1, 10]}
+    if name == "random_forest":
+        return RandomForestClassifier(class_weight="balanced", n_jobs=1, random_state=seed), {"model__n_estimators": [200] if quick else [300, 600], "model__max_depth": [None] if quick else [None, 6, 12], "model__min_samples_leaf": [1] if quick else [1, 3, 5]}
+    if name == "xgboost":
+        from xgboost import XGBClassifier
+        return XGBClassifier(objective="binary:logistic", eval_metric="logloss", n_jobs=1, random_state=seed), {"model__n_estimators": [200] if quick else [200, 500], "model__max_depth": [3] if quick else [2, 3, 5], "model__learning_rate": [0.05] if quick else [0.02, 0.05, 0.1], "model__subsample": [0.8], "model__colsample_bytree": [0.8]}
+    if name == "lightgbm":
+        from lightgbm import LGBMClassifier
+        return LGBMClassifier(class_weight="balanced", verbosity=-1, n_jobs=1, random_state=seed), {"model__n_estimators": [200] if quick else [200, 500], "model__num_leaves": [15] if quick else [7, 15, 31], "model__learning_rate": [0.05] if quick else [0.02, 0.05, 0.1]}
+    if name == "mlp":
+        from sklearn.neural_network import MLPClassifier
+        return MLPClassifier(max_iter=1000, early_stopping=True, random_state=seed), {"model__hidden_layer_sizes": [(128, 64)] if quick else [(64,), (128, 64), (256, 128)], "model__alpha": [1e-4] if quick else [1e-5, 1e-4, 1e-3], "model__learning_rate_init": [1e-3]}
+    raise ValueError(name)
+
+
+def make_pipeline(df: pd.DataFrame, estimator):
+    features = [c for c in df if c.startswith("feat_")]
+    categorical = [c for c in features if df[c].dtype == "object"]
+    numeric = [c for c in features if c not in categorical and not c.startswith("feat_fp_")]
+    fingerprint = [c for c in features if c.startswith("feat_fp_")]
+    num_pipe = Pipeline([("impute", SimpleImputer(strategy="median", add_indicator=True)), ("scale", StandardScaler())])
+    fp_pipe = Pipeline([("impute", SimpleImputer(strategy="constant", fill_value=0))])
+    cat_pipe = Pipeline([("impute", SimpleImputer(strategy="constant", fill_value="unreported")), ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False))])
+    prep = ColumnTransformer([("numeric", num_pipe, numeric), ("fingerprint", fp_pipe, fingerprint), ("categorical", cat_pipe, categorical)], sparse_threshold=0)
+    return Pipeline([("prep", prep), ("variance", VarianceThreshold()), ("correlation", CorrelationFilter(0.95)), ("model", estimator)])
+
+
+def metrics(y, pred, prob):
+    result = {"macro_f1": f1_score(y, pred, average="macro"), "mcc": matthews_corrcoef(y, pred), "pr_auc_minority_inactive": average_precision_score(1 - y, 1 - prob)}
+    result["roc_auc"] = roc_auc_score(y, prob) if len(np.unique(y)) == 2 else np.nan
+    return result
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--input", default="data/processed/transfection_modelready_v1.csv")
+    p.add_argument("--models", nargs="+", default=["majority", "logistic", "random_forest", "xgboost", "lightgbm"])
+    p.add_argument("--schemes", nargs="+", default=["grouped", "random"])
+    p.add_argument("--quick", action="store_true")
+    p.add_argument("--seed", type=int, default=42)
+    args = p.parse_args()
+    set_seed(args.seed)
+    df = pd.read_csv(args.input, low_memory=False)
+
+    if "group_joint_component" not in df.columns:
+        raise RuntimeError(
+            "group_joint_component is missing from the model-ready data."
+        )
+
+    y = df.target_transfection_active.astype(int).to_numpy()
+
+    for scheme in args.schemes:
+        fold_path = Path("data/processed") / f"folds_{scheme}_v1.csv"
+        fold_table = pd.read_csv(fold_path)
+
+        if len(fold_table) != len(df):
+            raise RuntimeError(
+                f"Fold-table row count does not match data: {fold_path}"
+            )
+
+        if not np.array_equal(
+            fold_table["id_lnp_id"].astype(str).to_numpy(),
+            df["id_lnp_id"].astype(str).to_numpy(),
+        ):
+            raise RuntimeError(
+                f"Fold-table row order does not match data: {fold_path}"
+            )
+
+        folds = fold_table.fold.to_numpy()
+        for model_name in args.models:
+            rows = []
+            fold_metrics = []
+            for fold in sorted(np.unique(folds)):
+                tr, te = np.where(folds != fold)[0], np.where(folds == fold)[0]
+                if scheme == "grouped":
+                    assert set(
+                        df.group_paper_doi.iloc[tr]
+                    ).isdisjoint(
+                        set(df.group_paper_doi.iloc[te])
+                    )
+
+                    assert set(
+                        df.group_lipid_key.iloc[tr]
+                    ).isdisjoint(
+                        set(df.group_lipid_key.iloc[te])
+                    )
+
+                    assert set(
+                        df.group_joint_component.iloc[tr]
+                    ).isdisjoint(
+                        set(df.group_joint_component.iloc[te])
+                    )
+                estimator, grid = estimator_and_grid(model_name, args.seed + int(fold), args.quick)
+                pipe = make_pipeline(df.iloc[tr], estimator)
+                if grid:
+                    if scheme == "grouped":
+                        inner_groups = (
+                            df.group_joint_component.iloc[tr].to_numpy()
+                        )
+
+                        number_of_inner_groups = len(
+                            np.unique(inner_groups)
+                        )
+
+                        if number_of_inner_groups < 2:
+                            raise RuntimeError(
+                                "Fewer than two joint components are "
+                                "available for inner cross-validation."
+                            )
+
+                        inner = StratifiedGroupKFold(
+                            n_splits=min(
+                                3,
+                                number_of_inner_groups,
+                            ),
+                            shuffle=True,
+                            random_state=args.seed + int(fold),
+                        )
+
+                        search = GridSearchCV(
+                            pipe,
+                            grid,
+                            scoring="f1_macro",
+                            cv=inner,
+                            n_jobs=4,
+                            refit=True,
+                        )
+
+                        search.fit(
+                            df.iloc[tr],
+                            y[tr],
+                            groups=inner_groups,
+                        )
+                    else:
+                        inner = StratifiedKFold(3, shuffle=True, random_state=args.seed + int(fold))
+                        search = GridSearchCV(pipe, grid, scoring="f1_macro", cv=inner, n_jobs=4, refit=True)
+                        search.fit(df.iloc[tr], y[tr])
+                    fitted = search.best_estimator_
+                    best_params = search.best_params_
+                else:
+                    fitted = pipe.fit(df.iloc[tr], y[tr])
+                    best_params = {}
+                pred = fitted.predict(df.iloc[te]).astype(int)
+                prob = fitted.predict_proba(df.iloc[te])[:, 1]
+                fm = metrics(y[te], pred, prob)
+                fm.update({"fold": int(fold), "best_params": json.dumps(best_params, sort_keys=True)})
+                fold_metrics.append(fm)
+                for j, ix in enumerate(te):
+                    rows.append({"id_lnp_id": df.id_lnp_id.iloc[ix], "group_paper_doi": df.group_paper_doi.iloc[ix], "group_lipid_key": df.group_lipid_key.iloc[ix], "y_true": y[ix], "y_pred": pred[j], "prob_active": prob[j], "fold": int(fold), "model": model_name, "scheme": scheme})
+                Path("models").mkdir(exist_ok=True)
+                joblib.dump(fitted, f"models/{model_name}_{scheme}_fold{fold}.joblib")
+            pred_df = pd.DataFrame(rows).sort_values("id_lnp_id")
+            overall = metrics(pred_df.y_true.to_numpy(), pred_df.y_pred.to_numpy(), pred_df.prob_active.to_numpy())
+            overall.update({"model": model_name, "scheme": scheme, "n": len(pred_df), "fold_metrics": fold_metrics})
+            Path("results/predictions").mkdir(parents=True, exist_ok=True)
+            pred_df.to_csv(f"results/predictions/{model_name}_{scheme}.csv", index=False)
+            write_json(overall, f"results/metrics/{model_name}_{scheme}.json")
+            print(model_name, scheme, overall)
+
+
+if __name__ == "__main__":
+    main()
+
+===== SUMMARY SCRIPT =====
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+os.environ.setdefault("MPLCONFIGDIR", str(Path(".matplotlib_cache").resolve()))
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.metrics import average_precision_score, f1_score, matthews_corrcoef
+
+
+def cluster_interval(pred: pd.DataFrame, metric: str, repeats: int = 500, seed: int = 42):
+    rng = np.random.default_rng(seed)
+    keys = pred["group_lipid_key"].unique()
+    by_key = {k: pred[pred.group_lipid_key == k] for k in keys}
+    values = []
+    for _ in range(repeats):
+        sample = pd.concat([by_key[k] for k in rng.choice(keys, len(keys), replace=True)], ignore_index=True)
+        if metric == "macro_f1":
+            values.append(f1_score(sample.y_true, sample.y_pred, average="macro"))
+        elif metric == "mcc":
+            values.append(matthews_corrcoef(sample.y_true, sample.y_pred))
+        else:
+            values.append(average_precision_score(1 - sample.y_true, 1 - sample.prob_active))
+    return np.quantile(values, [0.025, 0.975]).tolist()
+
+
+def main():
+    rows = []
+    for path in sorted(Path("results/metrics").glob("*.json")):
+        d = json.loads(path.read_text())
+        row = {k: d[k] for k in ["model", "scheme", "n", "macro_f1", "mcc", "pr_auc_minority_inactive", "roc_auc"]}
+        pred = pd.read_csv(f"results/predictions/{d['model']}_{d['scheme']}.csv")
+        for metric in ["macro_f1", "mcc", "pr_auc_minority_inactive"]:
+            low, high = cluster_interval(pred, metric)
+            row[f"{metric}_ci_low"] = low
+            row[f"{metric}_ci_high"] = high
+        rows.append(row)
+    if not rows:
+        raise SystemExit("No metric JSON files found")
+    df = pd.DataFrame(rows).sort_values(["model", "scheme"])
+    Path("results").mkdir(exist_ok=True)
+    Path("figures").mkdir(exist_ok=True)
+    df.to_csv("results/main_results.csv", index=False)
+
+    sns.set_theme(style="whitegrid", context="talk")
+    plt.figure(figsize=(10, 7))
+    sns.barplot(data=df, x="macro_f1", y="model", hue="scheme")
+    plt.xlim(0, 1)
+    plt.xlabel("Out-of-fold macro-F1")
+    plt.ylabel("")
+    plt.tight_layout()
+    plt.savefig("figures/split_scheme_gap.png", dpi=300)
+    plt.close()
+
+    long = df.melt(id_vars=["model", "scheme"], value_vars=["macro_f1", "mcc", "pr_auc_minority_inactive"], var_name="metric", value_name="value")
+    g = sns.catplot(data=long, x="value", y="model", hue="scheme", col="metric", kind="bar", height=5, aspect=0.8, sharex=False)
+    g.set_axis_labels("Out-of-fold score", "")
+    g.savefig("figures/model_benchmark.png", dpi=300)
+    plt.close("all")
+    print(df.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()
+===== DATA HEADER =====
+id_lnp_id,group_paper_doi,group_lipid_key,target_transfection_active,confounder_label_source,confounder_paper_year,confounder_administration_route,struct_ionizable_smiles,structure_available,feat_form_ionizable_lipid,feat_form_peg_lipid,feat_form_sterol_lipid,feat_form_helper_lipid,feat_form_ionizable_lipid_mol_percent_final,feat_form_peg_lipid_mol_percent_final,feat_form_sterol_lipid_mol_percent_final,feat_form_helper_lipid_mol_percent_final,feat_form_mixing_method,feat_form_solvent,feat_form_buffer,feat_form_buffer_ph,feat_phys_particle_size_nm_std,feat_phys_pdi_std,feat_phys_zeta_potential_mv_std,feat_phys_encapsulation_efficiency_percent_std,feat_chem2d_rdkit_mol_wt,feat_chem2d_rdkit_exact_mol_wt,feat_chem2d_rdkit_logp,feat_chem2d_rdkit_tpsa,feat_chem2d_rdkit_hbd,feat_chem2d_rdkit_hba,feat_chem2d_rdkit_rotatable_bonds,feat_chem2d_rdkit_heavy_atom_count,feat_chem2d_rdkit_num_rings,feat_chem2d_rdkit_num_aliphatic_rings,feat_chem2d_rdkit_num_aromatic_rings,feat_chem2d_rdkit_fraction_csp3,feat_chem2d_rdkit_formal_charge,feat_chem2d_rdkit_qed,feat_chem3d_radius_gyration,feat_chem3d_asphericity,feat_chem3d_eccentricity,feat_chem3d_inertial_shape_factor,feat_chem3d_npr1,feat_chem3d_npr2,feat_chem3d_pmi1,feat_chem3d_pmi2,feat_chem3d_pmi3,feat_chem3d_spherocity_index,feat_chem3d_mol_volume,feat_chem3d_energy,feat_chem3d_num_atoms_with_H,feat_chem2d_atom_count_C,feat_chem2d_atom_count_H,feat_chem2d_atom_count_N,feat_chem2d_atom_count_O,feat_chem2d_atom_count_P,feat_chem2d_atom_count_S,feat_chem2d_atom_count_F,feat_chem2d_atom_count_Cl,feat_chem2d_atom_count_Br,feat_chem2d_ester_count,feat_chem2d_amide_count,feat_chem2d_tertiary_amine_count,feat_chem2d_secondary_amine_count,feat_chem2d_primary_amine_count,feat_chem2d_hydroxyl_count,feat_chem2d_ether_count,feat_chem2d_halogen_count,feat_chem2d_phosphate_count,feat_chem2d_has_amine,feat_chem2d_has_ester,feat_chem2d_tail_longest_carbon_chain_len,feat_chem2d_tail_total_aliphatic_carbons,feat_chem2d_tail_terminal_carbon_count,feat_chem2d_tail_branching_carbon_count,feat_chem2d_tail_unsaturation_cc_double_bond_count,feat_chem2d_tail_aromatic_carbon_count,feat_chem2d_tail_branching_index,feat_chem2d_tail_unsaturation_index,feat_cargo_sequence_type,feat_cargo_transcript_length_nt,feat_cargo_CDS length_nt,feat_cargo_gc_content,feat_cargo_a_fraction,feat_cargo_u_fraction,feat_cargo_g_fraction,feat_cargo_c_fraction,feat_cargo_molecular_weight_approx_da,feat_cargo_length_nt_calculated,feat_cargo_cargo_is_mrna,feat_cargo_cargo_is_aso,feat_cargo_cargo_is_barcode,feat_cargo_cargo_is_pdna,feat_fp_1,feat_fp_2,feat_fp_3,feat_fp_5,feat_fp_8,feat_fp_11,feat_fp_13,feat_fp_14,feat_fp_15,feat_fp_21,feat_fp_22,feat_fp_26,feat_fp_27,feat_fp_28,feat_fp_29,feat_fp_31,feat_fp_32,feat_fp_33,feat_fp_38,feat_fp_39,feat_fp_41,feat_fp_48,feat_fp_59,feat_fp_66,feat_fp_69,feat_fp_72,feat_fp_73,feat_fp_74,feat_fp_80,feat_fp_81,feat_fp_87,feat_fp_90,feat_fp_97,feat_fp_99,feat_fp_104,feat_fp_110,feat_fp_114,feat_fp_115,feat_fp_116,feat_fp_117,feat_fp_118,feat_fp_120,feat_fp_125,feat_fp_139,feat_fp_140,feat_fp_145,feat_fp_147,feat_fp_150,feat_fp_151,feat_fp_157,feat_fp_166,feat_fp_169,feat_fp_172,feat_fp_173,feat_fp_174,feat_fp_175,feat_fp_177,feat_fp_184,feat_fp_185,feat_fp_190,feat_fp_191,feat_fp_192,feat_fp_193,feat_fp_196,feat_fp_197,feat_fp_198,feat_fp_201,feat_fp_202,feat_fp_205,feat_fp_207,feat_fp_210,feat_fp_216,feat_fp_221,feat_fp_222,feat_fp_225,feat_fp_227,feat_fp_229,feat_fp_231,feat_fp_237,feat_fp_245,feat_fp_246,feat_fp_251,feat_fp_255,feat_fp_261,feat_fp_264,feat_fp_275,feat_fp_278,feat_fp_281,feat_fp_283,feat_fp_306,feat_fp_307,feat_fp_313,feat_fp_314,feat_fp_316,feat_fp_319,feat_fp_322,feat_fp_323,feat_fp_334,feat_fp_339,feat_fp_345,feat_fp_348,feat_fp_350,feat_fp_355,feat_fp_357,feat_fp_363,feat_fp_364,feat_fp_375,feat_fp_378,feat_fp_380,feat_fp_381,feat_fp_382,feat_fp_383,feat_fp_384,feat_fp_385,feat_fp_389,feat_fp_392,feat_fp_396,feat_fp_397,feat_fp_399,feat_fp_401,feat_fp_409,feat_fp_411,feat_fp_414,feat_fp_419,feat_fp_424,feat_fp_425,feat_fp_430,feat_fp_432,feat_fp_446,feat_fp_448,feat_fp_459,feat_fp_465,feat_fp_472,feat_fp_473,feat_fp_478,feat_fp_484,feat_fp_485,feat_fp_486,feat_fp_487,feat_fp_507,feat_fp_509,feat_fp_518,feat_fp_519,feat_fp_523,feat_fp_534,feat_fp_541,feat_fp_556,feat_fp_567,feat_fp_573,feat_fp_577,feat_fp_587,feat_fp_591,feat_fp_592,feat_fp_599,feat_fp_606,feat_fp_619,feat_fp_620,feat_fp_624,feat_fp_628,feat_fp_630,feat_fp_639,feat_fp_643,feat_fp_646,feat_fp_650,feat_fp_652,feat_fp_653,feat_fp_654,feat_fp_655,feat_fp_656,feat_fp_657,feat_fp_662,feat_fp_667,feat_fp_674,feat_fp_677,feat_fp_679,feat_fp_685,feat_fp_689,feat_fp_692,feat_fp_693,feat_fp_694,feat_fp_695,feat_fp_703,feat_fp_710,feat_fp_713,feat_fp_714,feat_fp_715,feat_fp_718,feat_fp_724,feat_fp_725,feat_fp_727,feat_fp_729,feat_fp_734,feat_fp_736,feat_fp_738,feat_fp_739,feat_fp_746,feat_fp_749,feat_fp_751,feat_fp_753,feat_fp_755,feat_fp_765,feat_fp_768,feat_fp_769,feat_fp_770,feat_fp_771,feat_fp_772,feat_fp_775,feat_fp_782,feat_fp_784,feat_fp_794,feat_fp_795,feat_fp_800,feat_fp_804,feat_fp_807,feat_fp_809,feat_fp_810,feat_fp_829,feat_fp_830,feat_fp_831,feat_fp_832,feat_fp_834,feat_fp_842,feat_fp_843,feat_fp_854,feat_fp_869,feat_fp_874,feat_fp_875,feat_fp_876,feat_fp_881,feat_fp_886,feat_fp_890,feat_fp_893,feat_fp_897,feat_fp_899,feat_fp_909,feat_fp_912,feat_fp_913,feat_fp_916,feat_fp_926,feat_fp_928,feat_fp_932,feat_fp_935,feat_fp_945,feat_fp_946,feat_fp_948,feat_fp_950,feat_fp_951,feat_fp_955,feat_fp_966,feat_fp_968,feat_fp_976,feat_fp_978,feat_fp_980,feat_fp_981,feat_fp_991,feat_fp_993,feat_fp_1002,feat_fp_1004,feat_fp_1006,feat_fp_1008,feat_fp_1017,feat_fp_1019,feat_fp_1027,feat_fp_1028,feat_fp_1034,feat_fp_1038,feat_fp_1056,feat_fp_1066,feat_fp_1070,feat_fp_1071,feat_fp_1077,feat_fp_1081,feat_fp_1083,feat_fp_1088,feat_fp_1111,feat_fp_1114,feat_fp_1120,feat_fp_1127,feat_fp_1130,feat_fp_1142,feat_fp_1143,feat_fp_1145,feat_fp_1149,feat_fp_1152,feat_fp_1163,feat_fp_1168,feat_fp_1171,feat_fp_1172,feat_fp_1195,feat_fp_1196,feat_fp_1199,feat_fp_1207,feat_fp_1218,feat_fp_1235,feat_fp_1236,feat_fp_1238,feat_fp_1240,feat_fp_1243,feat_fp_1249,feat_fp_1253,feat_fp_1261,feat_fp_1267,feat_fp_1280,feat_fp_1283,feat_fp_1284,feat_fp_1290,feat_fp_1309,feat_fp_1312,feat_fp_1316,feat_fp_1317,feat_fp_1321,feat_fp_1322,feat_fp_1325,feat_fp_1328,feat_fp_1332,feat_fp_1347,feat_fp_1355,feat_fp_1358,feat_fp_1367,feat_fp_1374,feat_fp_1380,feat_fp_1386,feat_fp_1393,feat_fp_1399,feat_fp_1416,feat_fp_1417,feat_fp_1420,feat_fp_1422,feat_fp_1427,feat_fp_1430,feat_fp_1432,feat_fp_1433,feat_fp_1435,feat_fp_1436,feat_fp_1441,feat_fp_1444,feat_fp_1452,feat_fp_1454,feat_fp_1476,feat_fp_1480,feat_fp_1482,feat_fp_1486,feat_fp_1489,feat_fp_1517,feat_fp_1530,feat_fp_1539,feat_fp_1544,feat_fp_1552,feat_fp_1564,feat_fp_1573,feat_fp_1581,feat_fp_1583,feat_fp_1602,feat_fp_1603,feat_fp_1610,feat_fp_1617,feat_fp_1619,feat_fp_1624,feat_fp_1653,feat_fp_1668,feat_fp_1669,feat_fp_1670,feat_fp_1683,feat_fp_1698,feat_fp_1710,feat_fp_1712,feat_fp_1713,feat_fp_1714,feat_fp_1716,feat_fp_1719,feat_fp_1722,feat_fp_1724,feat_fp_1734,feat_fp_1741,feat_fp_1742,feat_fp_1750,feat_fp_1752,feat_fp_1754,feat_fp_1755,feat_fp_1757,feat_fp_1758,feat_fp_1760,feat_fp_1761,feat_fp_1765,feat_fp_1780,feat_fp_1791,feat_fp_1810,feat_fp_1824,feat_fp_1840,feat_fp_1860,feat_fp_1864,feat_fp_1866,feat_fp_1871,feat_fp_1873,feat_fp_1876,feat_fp_1903,feat_fp_1911,feat_fp_1917,feat_fp_1922,feat_fp_1925,feat_fp_1951,feat_fp_1954,feat_fp_1960,feat_fp_1961,feat_fp_1968,feat_fp_1990,feat_fp_1997,feat_fp_1998,feat_fp_2017,feat_fp_2018,feat_fp_2022,feat_fp_2038,feat_fp_2039,feat_fp_2043,group_joint_component
+===== FOLD HEADER =====
+id_lnp_id,group_paper_doi,group_lipid_key,group_joint_component,target_transfection_active,fold
+1,10.1038/s41467-024-50619-z,structure_missing_lnp_1,component_010,1,2

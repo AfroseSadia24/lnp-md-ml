@@ -1,0 +1,51 @@
+{
+  "macro_f1": 0.6757775821596244,
+  "mcc": 0.37203336935181014,
+  "pr_auc_minority_inactive": 0.5744953086020862,
+  "roc_auc": 0.7708826556870818,
+  "model": "xgboost",
+  "scheme": "random",
+  "n": 451,
+  "fold_metrics": [
+    {
+      "macro_f1": 0.6285714285714286,
+      "mcc": 0.31356275642396014,
+      "pr_auc_minority_inactive": 0.6050208606656174,
+      "roc_auc": 0.8047263681592041,
+      "fold": 0,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.05, \"model__max_depth\": 5, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.6464285714285715,
+      "mcc": 0.30298896589007596,
+      "pr_auc_minority_inactive": 0.443362700517663,
+      "roc_auc": 0.7345879299156391,
+      "fold": 1,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.02, \"model__max_depth\": 5, \"model__n_estimators\": 500, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.7217675941080197,
+      "mcc": 0.460482589120675,
+      "pr_auc_minority_inactive": 0.6552279941900538,
+      "roc_auc": 0.8202465931213497,
+      "fold": 2,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.05, \"model__max_depth\": 3, \"model__n_estimators\": 500, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.6785714285714286,
+      "mcc": 0.36807012801443595,
+      "pr_auc_minority_inactive": 0.5634029447728315,
+      "roc_auc": 0.737183646982479,
+      "fold": 3,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.1, \"model__max_depth\": 3, \"model__n_estimators\": 500, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.6997776130467013,
+      "mcc": 0.4215172988445178,
+      "pr_auc_minority_inactive": 0.6207913964634189,
+      "roc_auc": 0.789422452952628,
+      "fold": 4,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.05, \"model__max_depth\": 5, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    }
+  ]
+}

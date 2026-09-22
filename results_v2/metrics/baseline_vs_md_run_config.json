@@ -1,0 +1,20 @@
+{
+  "algorithm": "ExtraTreesClassifier",
+  "n_estimators": 800,
+  "class_weight": "balanced",
+  "min_samples_leaf": 2,
+  "max_features": "sqrt",
+  "classification_threshold": 0.5,
+  "validation": "DOI-grouped four-fold CV",
+  "baseline_numeric_features": 74,
+  "baseline_categorical_features": 6,
+  "md_features": 12,
+  "rows": 13,
+  "target": "transfection_active",
+  "file_hashes": {
+    "baseline_numeric_features.txt": "6e82804b499a8beaba7cdc3d894a0685ee971aaa546798113513b10efa809b4a",
+    "baseline_categorical_features.txt": "c4cabed93920dea390a0880b30738c44257242d2e3abd89890b909787f60b87c",
+    "md_features.txt": "d7bd5c4d5a7d9e7c8a246525d5f8b3a21dfd24ccc2c52b5426a3b2c6ce07fb81",
+    "doi_grouped_folds.csv": "58273f6c97046c445c2cc42a9d8de7d10052b55747833602601a023378c013ad"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "macro_f1": 0.39107020919982616,
+  "mcc": -0.20546062359074754,
+  "pr_auc_minority_inactive": 0.1922069622195611,
+  "roc_auc": 0.35095213587236235,
+  "model": "xgboost",
+  "scheme": "grouped",
+  "n": 451,
+  "fold_metrics": [
+    {
+      "macro_f1": 0.37840256328839883,
+      "mcc": -0.2419020083440532,
+      "pr_auc_minority_inactive": 0.14730159861500852,
+      "roc_auc": 0.30811511857707513,
+      "fold": 0,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.1, \"model__max_depth\": 3, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.4519230769230769,
+      "mcc": -0.0942285694863091,
+      "pr_auc_minority_inactive": 0.08278527028527027,
+      "roc_auc": 0.40094339622641506,
+      "fold": 1,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.02, \"model__max_depth\": 2, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.36666666666666664,
+      "mcc": -0.10990828873553218,
+      "pr_auc_minority_inactive": 0.3142641083699185,
+      "roc_auc": 0.27621483375959077,
+      "fold": 2,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.1, \"model__max_depth\": 2, \"model__n_estimators\": 500, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.3595505617977528,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.4315693417871557,
+      "roc_auc": 0.46249999999999997,
+      "fold": 3,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.05, \"model__max_depth\": 2, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    },
+    {
+      "macro_f1": 0.40816326530612246,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.370924087937034,
+      "roc_auc": 0.55625,
+      "fold": 4,
+      "best_params": "{\"model__colsample_bytree\": 0.8, \"model__learning_rate\": 0.02, \"model__max_depth\": 2, \"model__n_estimators\": 200, \"model__subsample\": 0.8}"
+    }
+  ]
+}

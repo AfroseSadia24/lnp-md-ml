@@ -1,0 +1,9 @@
+cargo_transcript_length_nt
+cargo_CDS length_nt
+cargo_gc_content
+cargo_a_fraction
+cargo_u_fraction
+cargo_g_fraction
+cargo_c_fraction
+cargo_molecular_weight_approx_da
+cargo_length_nt_calculated

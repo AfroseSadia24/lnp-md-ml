@@ -1,0 +1,13 @@
+{
+  "validation": "leave-one-MD-source-out",
+  "independent_md_sources": 6,
+  "rows": 13,
+  "training_weighting": "equal total weight per MD source",
+  "algorithm": "ExtraTreesClassifier",
+  "n_estimators": 800,
+  "min_samples_leaf": 2,
+  "class_weight": "balanced",
+  "baseline_features": 80,
+  "md_features": 12,
+  "enhanced_features": 92
+}

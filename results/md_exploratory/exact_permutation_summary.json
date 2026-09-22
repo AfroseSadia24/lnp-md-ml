@@ -1,0 +1,59 @@
+{
+  "test": "Exact permutation of six MD vectors among six MD source groups",
+  "number_of_permutations": 720,
+  "number_of_md_sources": 6,
+  "number_of_rows": 13,
+  "features": [
+    "md_LNP_only_Rg_nm_mean_last100ns",
+    "md_LNP_core_Rg_nm_mean_last100ns",
+    "md_LNP_only_SASA_nm2_mean_last100ns",
+    "md_RNA_Rg_nm_mean_last100ns",
+    "md_LNP_RNA_Rg_nm_mean_last100ns",
+    "md_RNA_LNP_COM_distance_nm_mean_last100ns",
+    "md_RNA_LNP_mindist_nm_mean_last100ns",
+    "md_RNA_LNP_contacts_0p6nm_mean_last100ns",
+    "md_RNA_buried_fraction_contact_based_mean_last100ns",
+    "md_LNP_only_shape_anisotropy_kappa2_mean_last100ns",
+    "md_LNP_only_compactness_inv_Rg_1_per_nm_mean_last100ns",
+    "md_water_inside_LNP_core_RgSphere_count_fraction_of_total_water_mean_last100ns"
+  ],
+  "observed_metrics": {
+    "macro_f1": 0.7187500000000002,
+    "mcc": 0.45584230583855184,
+    "inactive_pr_auc": 0.49404761904761907,
+    "roc_auc": 0.5584415584415585
+  },
+  "exact_one_sided_p_values": {
+    "macro_f1": 0.24166666666666667,
+    "mcc": 0.24166666666666667,
+    "inactive_pr_auc": 0.425,
+    "roc_auc": 0.35
+  },
+  "null_distribution": {
+    "macro_f1": {
+      "mean": 0.46707632575561475,
+      "median": 0.43750000000000006,
+      "q025": 0.1,
+      "q975": 0.8875000000000002
+    },
+    "mcc": {
+      "mean": -0.05509374999466293,
+      "median": -0.11396057645963795,
+      "q025": -0.7977240352174653,
+      "q975": 0.7977240352174658
+    },
+    "inactive_pr_auc": {
+      "mean": 0.47620370370370374,
+      "median": 0.4345238095238095,
+      "q025": 0.2942460317460317,
+      "q975": 0.7738095238095237
+    },
+    "roc_auc": {
+      "mean": 0.4353896103896103,
+      "median": 0.42207792207792205,
+      "q025": 0.05194805194805194,
+      "q975": 0.8896103896103897
+    }
+  },
+  "interpretation": "Exploratory exact test with only six independent MD source simulations."
+}

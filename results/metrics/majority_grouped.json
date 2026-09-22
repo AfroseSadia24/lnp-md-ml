@@ -1,0 +1,51 @@
+{
+  "macro_f1": 0.4262086513994911,
+  "mcc": 0.0,
+  "pr_auc_minority_inactive": 0.22088588654458885,
+  "roc_auc": 0.38515182707153883,
+  "model": "majority",
+  "scheme": "grouped",
+  "n": 451,
+  "fold_metrics": [
+    {
+      "macro_f1": 0.44221105527638194,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.2072072072072072,
+      "roc_auc": 0.5,
+      "fold": 0,
+      "best_params": "{}"
+    },
+    {
+      "macro_f1": 0.4818181818181818,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.07017543859649122,
+      "roc_auc": 0.5,
+      "fold": 1,
+      "best_params": "{}"
+    },
+    {
+      "macro_f1": 0.37362637362637363,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.40350877192982454,
+      "roc_auc": 0.5,
+      "fold": 2,
+      "best_params": "{}"
+    },
+    {
+      "macro_f1": 0.3595505617977528,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.43859649122807015,
+      "roc_auc": 0.5,
+      "fold": 3,
+      "best_params": "{}"
+    },
+    {
+      "macro_f1": 0.40816326530612246,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.3103448275862069,
+      "roc_auc": 0.5,
+      "fold": 4,
+      "best_params": "{}"
+    }
+  ]
+}

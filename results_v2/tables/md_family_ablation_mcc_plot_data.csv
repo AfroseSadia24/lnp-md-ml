@@ -1,0 +1,4 @@
+weighting,family,number_features,metric,add_family_delta_vs_baseline,leave_family_out_effect,display_name
+source_balanced,size_shape,7,mcc,0.4420781597873031,0.6207187870663166,Size and shape
+source_balanced,rna_association,4,mcc,0.0743527288483349,-0.069037003492667,RNA association
+source_balanced,water_penetration,1,mcc,0.1561893874118372,0.0767882863491851,Water penetration

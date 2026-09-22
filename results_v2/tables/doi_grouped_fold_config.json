@@ -1,0 +1,10 @@
+{
+  "validation": "StratifiedGroupKFold",
+  "group_column": "paper_doi",
+  "target_column": "transfection_active",
+  "number_of_folds": 4,
+  "random_state": 154,
+  "selection_rule": "Largest valid fold count among 4, 3, and 2. Every train and test fold must contain both classes. Ties use class and row balance only.",
+  "number_of_rows": 13,
+  "number_of_doi_groups": 7
+}

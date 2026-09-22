@@ -1,0 +1,7 @@
+md_source_lnp_id,mapped_rows,active,doi_groups,mapped_lnp_ids,inactive,active_fraction
+LNP193,1,1,1,193,0,1.0
+LNP194,1,1,1,194,0,1.0
+LNP195,1,0,1,195,1,0.0
+LNP782,2,2,2,782;875,0,1.0
+LNP854,2,1,2,783;911,1,0.5
+LNP858,6,1,4,636;687;781;922;923;931,5,0.16666666666666666

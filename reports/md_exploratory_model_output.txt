@@ -1,0 +1,20 @@
+Finished holdout LNP193: 1 testing rows
+Finished holdout LNP194: 1 testing rows
+Finished holdout LNP195: 1 testing rows
+Finished holdout LNP782: 2 testing rows
+Finished holdout LNP854: 2 testing rows
+Finished holdout LNP858: 6 testing rows
+
+===== EXPLORATORY MD-ONLY MODEL =====
+Rows: 13
+Independent MD sources: 6
+Macro-F1: 0.7636
+MCC: 0.5367
+Inactive PR-AUC: 0.6943
+ROC-AUC: 0.6429
+
+WARNING: exploratory result based on only six independent MD sources.
+Written: results/md_exploratory/md_only_loso_predictions.csv
+Written: results/md_exploratory/md_only_loso_metrics.json
+Written: figures/md_exploratory_predictions.png
+Written: figures/md_exploratory_confusion_matrix.png

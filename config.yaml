@@ -1,0 +1,13 @@
+seed: 42
+target: transfection_active
+id_column: lnp_id
+group_column: group_paper_doi
+lipid_column: group_lipid_key
+outer_folds: 5
+inner_folds: 3
+correlation_threshold: 0.95
+minimum_fill_fraction: 0.10
+primary_scheme: grouped
+positive_label: 1
+minority_label: 0
+

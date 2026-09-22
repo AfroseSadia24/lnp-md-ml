@@ -1,0 +1,82 @@
+# Trained model artifacts
+/models/
+/results_v2/models/
+
+# Archived and backup results
+/results_v2/archive_before_paired_seed_fix/
+*.before_*
+
+
+# Local caches, logs, and backups
+
+
+.matplotlib_cache/
+backups/
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+micromamba/
+.micromamba/
+
+# Credentials and private configuration
+.env
+.env.*
+*.pem
+*.key
+credentials*
+secrets*
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# HPC and logs
+slurm-*.out
+*.log
+core.*
+nohup.out
+
+# Large molecular-dynamics outputs
+*.xtc
+*.trr
+*.dcd
+*.cpt
+*.edr
+*.tpr
+*.nc
+
+# Run and temporary directories
+**/trajectories/
+**/runs/
+**/checkpoints/
+tmp/
+temp/
+scratch/
+
+# Large archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+
+# Raw or restricted data
+data/raw/
+data/interim/
+
+# Serialized models, unless intentionally released
+*.pkl
+*.pickle
+*.joblib
+
+

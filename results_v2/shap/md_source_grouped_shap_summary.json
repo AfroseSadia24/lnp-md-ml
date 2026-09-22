@@ -1,0 +1,18 @@
+{
+  "analysis": "Source-grouped out-of-fold SHAP for the baseline-plus-MD ExtraTrees model",
+  "number_rows": 13,
+  "number_md_sources": 6,
+  "number_md_features": 12,
+  "number_estimators": 800,
+  "minimum_samples_leaf": 2,
+  "class_weight": "balanced",
+  "source_balanced_training_weights": true,
+  "maximum_shap_additivity_error": 1.5654144647214707e-14,
+  "prediction_reproduction_audit": {
+    "reference_file_available": true,
+    "number_compared_rows": 13,
+    "maximum_absolute_probability_difference": 0.04373130239858192,
+    "status": "REVIEW"
+  },
+  "interpretation": "Exploratory analysis based on six independent MD source vectors. Family-level interpretation is preferred because several descriptors are strongly correlated."
+}

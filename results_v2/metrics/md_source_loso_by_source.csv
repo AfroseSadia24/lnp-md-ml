@@ -1,0 +1,13 @@
+model,md_source_lnp_id,rows,active,mean_probability,predicted_active,inactive
+baseline,LNP193,1,1,0.6242017154384506,1,0
+baseline,LNP194,1,1,0.5634625498952925,1,0
+baseline,LNP195,1,0,0.9381277382747969,1,1
+baseline,LNP782,2,2,0.5059075415601835,1,0
+baseline,LNP854,2,1,0.7223211189729644,1,1
+baseline,LNP858,6,1,0.4680060250976222,1,5
+baseline_plus_md,LNP193,1,1,0.6875115765131963,1,0
+baseline_plus_md,LNP194,1,1,0.5747801769747216,1,0
+baseline_plus_md,LNP195,1,0,0.7458730921855925,1,1
+baseline_plus_md,LNP782,2,2,0.5786995576779823,2,0
+baseline_plus_md,LNP854,2,1,0.8255435805675799,2,1
+baseline_plus_md,LNP858,6,1,0.4752000042390667,1,5

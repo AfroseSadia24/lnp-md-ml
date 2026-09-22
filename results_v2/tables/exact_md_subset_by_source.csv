@@ -1,0 +1,7 @@
+md_source_lnp_id,rows,unique_lnp_ids,active,doi_groups,inactive
+LNP193,1,1,1,1,0
+LNP194,1,1,1,1,0
+LNP195,1,1,0,1,1
+LNP782,2,2,2,2,0
+LNP854,2,2,1,2,1
+LNP858,6,6,1,4,5

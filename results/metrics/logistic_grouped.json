@@ -1,0 +1,51 @@
+{
+  "macro_f1": 0.4328083028083028,
+  "mcc": -0.13242160223646673,
+  "pr_auc_minority_inactive": 0.23615569831663943,
+  "roc_auc": 0.3917009778692743,
+  "model": "logistic",
+  "scheme": "grouped",
+  "n": 451,
+  "fold_metrics": [
+    {
+      "macro_f1": 0.4320276211530341,
+      "mcc": -0.11044274727700576,
+      "pr_auc_minority_inactive": 0.1940585792041493,
+      "roc_auc": 0.41001729249011853,
+      "fold": 0,
+      "best_params": "{\"model__C\": 0.01}"
+    },
+    {
+      "macro_f1": 0.4020979020979021,
+      "mcc": -0.07672703233418503,
+      "pr_auc_minority_inactive": 0.06119248593181066,
+      "roc_auc": 0.3113207547169811,
+      "fold": 1,
+      "best_params": "{\"model__C\": 0.01}"
+    },
+    {
+      "macro_f1": 0.4598104598104598,
+      "mcc": -0.05392623524306571,
+      "pr_auc_minority_inactive": 0.49809107181070283,
+      "roc_auc": 0.5639386189258312,
+      "fold": 2,
+      "best_params": "{\"model__C\": 10}"
+    },
+    {
+      "macro_f1": 0.4020979020979021,
+      "mcc": 0.15118578920369088,
+      "pr_auc_minority_inactive": 0.5620528632270246,
+      "roc_auc": 0.58375,
+      "fold": 3,
+      "best_params": "{\"model__C\": 1}"
+    },
+    {
+      "macro_f1": 0.4361111111111111,
+      "mcc": -0.12777777777777777,
+      "pr_auc_minority_inactive": 0.3086425044124199,
+      "roc_auc": 0.5222222222222223,
+      "fold": 4,
+      "best_params": "{\"model__C\": 0.01}"
+    }
+  ]
+}

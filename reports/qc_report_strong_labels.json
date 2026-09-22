@@ -1,0 +1,23 @@
+{
+  "input": "/home/sa594/LNP_ML/hpc_lnp_ml/data/raw/LNP_transfection_strong_labels_451.csv",
+  "sha256": "19a1ee6827511c9e943a398974727ffe0150e76f44ecd5b325936857f3463d57",
+  "rows": 451,
+  "columns": 508,
+  "target_counts": {
+    "1": 335,
+    "0": 116
+  },
+  "raw_doi_groups": 48,
+  "normalized_doi_groups": 48,
+  "unique_lnp_ids": 451,
+  "unique_structure_strings": 166,
+  "missing_structures": 74,
+  "duplicate_lnp_ids": 0,
+  "id_803_rows": [],
+  "id_803_warning": "ID 803 has a curator-assigned inactive label without a published value; retain and run exclusion sensitivity.",
+  "columns_below_10pct_fill": [],
+  "zero_variance_columns": [
+    "transfection_label_source",
+    "cargo_cargo_is_pdna"
+  ]
+}

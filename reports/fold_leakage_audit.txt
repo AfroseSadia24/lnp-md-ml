@@ -1,0 +1,12 @@
+Primary split: GroupKFold by normalized paper DOI
+Rows: 451
+DOI groups: 48
+
+Fold 0: train=360, test=91, DOI overlap=0, lipid overlap=6
+Fold 1: train=361, test=90, DOI overlap=0, lipid overlap=2
+Fold 2: train=361, test=90, DOI overlap=0, lipid overlap=5
+Fold 3: train=361, test=90, DOI overlap=0, lipid overlap=5
+Fold 4: train=361, test=90, DOI overlap=0, lipid overlap=4
+
+PASS: all primary folds are DOI-disjoint.
+NOTE: some common lipids occur in multiple papers. This is retained as a documented limitation and sensitivity analysis.

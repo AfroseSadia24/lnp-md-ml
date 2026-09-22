@@ -1,0 +1,83 @@
+{
+  "test": "Exact permutation of each MD family among six independent MD sources",
+  "primary_metric": "source_balanced_mcc",
+  "number_of_sources": 6,
+  "permutations_per_family": 720,
+  "number_of_families": 3,
+  "multiple_testing_correction": "Holm correction across the three family-level MCC tests",
+  "baseline_metrics": {
+    "roc_auc": 0.30194805194805185,
+    "pr_auc_active": 0.5520682502363536,
+    "pr_auc_inactive": 0.4307359307359307,
+    "balanced_accuracy": 0.4837662337662338,
+    "macro_f1": 0.4791489361702128,
+    "mcc": -0.03436040663720258
+  },
+  "family_features": {
+    "size_shape": [
+      "md_LNP_only_Rg_nm_mean_last100ns",
+      "md_LNP_core_Rg_nm_mean_last100ns",
+      "md_LNP_only_SASA_nm2_mean_last100ns",
+      "md_RNA_Rg_nm_mean_last100ns",
+      "md_LNP_RNA_Rg_nm_mean_last100ns",
+      "md_LNP_only_shape_anisotropy_kappa2_mean_last100ns",
+      "md_LNP_only_compactness_inv_Rg_1_per_nm_mean_last100ns"
+    ],
+    "rna_association": [
+      "md_RNA_LNP_COM_distance_nm_mean_last100ns",
+      "md_RNA_LNP_mindist_nm_mean_last100ns",
+      "md_RNA_LNP_contacts_0p6nm_mean_last100ns",
+      "md_RNA_buried_fraction_contact_based_mean_last100ns"
+    ],
+    "water_penetration": [
+      "md_water_inside_LNP_core_RgSphere_count_fraction_of_total_water_mean_last100ns"
+    ]
+  },
+  "mcc_results": [
+    {
+      "family": "size_shape",
+      "number_features": 7,
+      "metric": "mcc",
+      "baseline_metric": -0.03436040663720258,
+      "observed_family_metric": 0.40771775315010056,
+      "observed_delta": 0.44207815978730314,
+      "null_mean_delta": -0.11274159425135835,
+      "null_median_delta": -0.1935607462820734,
+      "null_q025": -0.5297156681805639,
+      "null_q975": 0.44207815978730314,
+      "exact_one_sided_p": 0.06666666666666667,
+      "holm_adjusted_p_mcc": 0.175,
+      "holm_reject_0p05_mcc": false
+    },
+    {
+      "family": "rna_association",
+      "number_features": 4,
+      "metric": "mcc",
+      "baseline_metric": -0.03436040663720258,
+      "observed_family_metric": -0.282038037408883,
+      "observed_delta": -0.24767763077168042,
+      "null_mean_delta": 0.06968970314469317,
+      "null_median_delta": 0.0743527288483349,
+      "null_q025": -0.35756435103189516,
+      "null_q975": 0.44207815978730314,
+      "exact_one_sided_p": 0.9680555555555556,
+      "holm_adjusted_p_mcc": 0.9680555555555556,
+      "holm_reject_0p05_mcc": false
+    },
+    {
+      "family": "water_penetration",
+      "number_features": 1,
+      "metric": "mcc",
+      "baseline_metric": -0.03436040663720258,
+      "observed_family_metric": 0.1218289807746346,
+      "observed_delta": 0.1561893874118372,
+      "null_mean_delta": 0.014805007499022553,
+      "null_median_delta": 0.0,
+      "null_q025": -0.13447076219396628,
+      "null_q975": 0.1561893874118372,
+      "exact_one_sided_p": 0.058333333333333334,
+      "holm_adjusted_p_mcc": 0.175,
+      "holm_reject_0p05_mcc": false
+    }
+  ]
+}

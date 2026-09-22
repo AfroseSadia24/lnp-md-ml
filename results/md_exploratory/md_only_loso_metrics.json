@@ -1,0 +1,79 @@
+{
+  "macro_f1": 0.7636363636363637,
+  "mcc": 0.5367450401216932,
+  "pr_auc_minority_inactive": 0.694270015698587,
+  "roc_auc": 0.6428571428571428,
+  "model": "regularized_logistic_pca",
+  "validation": "leave_one_md_source_out",
+  "n_rows": 13,
+  "n_md_sources": 6,
+  "n_original_md_features": 12,
+  "n_pca_components": 2,
+  "features": [
+    "md_LNP_only_Rg_nm_mean_last100ns",
+    "md_LNP_core_Rg_nm_mean_last100ns",
+    "md_LNP_only_SASA_nm2_mean_last100ns",
+    "md_RNA_Rg_nm_mean_last100ns",
+    "md_LNP_RNA_Rg_nm_mean_last100ns",
+    "md_RNA_LNP_COM_distance_nm_mean_last100ns",
+    "md_RNA_LNP_mindist_nm_mean_last100ns",
+    "md_RNA_LNP_contacts_0p6nm_mean_last100ns",
+    "md_RNA_buried_fraction_contact_based_mean_last100ns",
+    "md_LNP_only_shape_anisotropy_kappa2_mean_last100ns",
+    "md_LNP_only_compactness_inv_Rg_1_per_nm_mean_last100ns",
+    "md_water_inside_LNP_core_RgSphere_count_fraction_of_total_water_mean_last100ns"
+  ],
+  "fold_results": [
+    {
+      "fold": 0,
+      "held_source": "LNP193",
+      "testing_rows": 1,
+      "active": 1,
+      "inactive": 0
+    },
+    {
+      "fold": 1,
+      "held_source": "LNP194",
+      "testing_rows": 1,
+      "active": 1,
+      "inactive": 0
+    },
+    {
+      "fold": 2,
+      "held_source": "LNP195",
+      "testing_rows": 1,
+      "active": 0,
+      "inactive": 1
+    },
+    {
+      "fold": 3,
+      "held_source": "LNP782",
+      "testing_rows": 2,
+      "active": 2,
+      "inactive": 0
+    },
+    {
+      "fold": 4,
+      "held_source": "LNP854",
+      "testing_rows": 2,
+      "active": 1,
+      "inactive": 1,
+      "macro_f1": 0.3333333333333333,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.5,
+      "roc_auc": 0.5
+    },
+    {
+      "fold": 5,
+      "held_source": "LNP858",
+      "testing_rows": 6,
+      "active": 1,
+      "inactive": 5,
+      "macro_f1": 0.45454545454545453,
+      "mcc": 0.0,
+      "pr_auc_minority_inactive": 0.8333333333333334,
+      "roc_auc": 0.5
+    }
+  ],
+  "interpretation": "Exploratory only due to six independent MD source simulations."
+}

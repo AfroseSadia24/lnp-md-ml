@@ -1,0 +1,173 @@
+{
+  "test": "Exact permutation of six MD vectors among six MD-source groups",
+  "number_of_permutations": 720,
+  "number_of_sources": 6,
+  "number_of_rows": 13,
+  "primary_statistic": "source_balanced_delta_mcc",
+  "baseline_row_metrics": {
+    "roc_auc": 0.5476190476190477,
+    "pr_auc_active": 0.5057239057239057,
+    "pr_auc_inactive": 0.71212715855573,
+    "balanced_accuracy": 0.5357142857142857,
+    "macro_f1": 0.5357142857142857,
+    "mcc": 0.07142857142857142
+  },
+  "baseline_source_balanced_metrics": {
+    "roc_auc": 0.30844155844155835,
+    "pr_auc_active": 0.5537022371644582,
+    "pr_auc_inactive": 0.4783549783549783,
+    "balanced_accuracy": 0.4837662337662338,
+    "macro_f1": 0.4791489361702128,
+    "mcc": -0.03436040663720258
+  },
+  "observed_identity_results": {
+    "permutation": 1,
+    "is_identity": true,
+    "row_weighted_roc_auc": 0.6428571428571429,
+    "row_weighted_delta_roc_auc": 0.09523809523809523,
+    "row_weighted_pr_auc_active": 0.55995670995671,
+    "row_weighted_delta_pr_auc_active": 0.0542328042328043,
+    "row_weighted_pr_auc_inactive": 0.7745421245421246,
+    "row_weighted_delta_pr_auc_inactive": 0.06241496598639451,
+    "row_weighted_balanced_accuracy": 0.7023809523809523,
+    "row_weighted_delta_balanced_accuracy": 0.16666666666666663,
+    "row_weighted_macro_f1": 0.6904761904761905,
+    "row_weighted_delta_macro_f1": 0.15476190476190477,
+    "row_weighted_mcc": 0.4147575310031266,
+    "row_weighted_delta_mcc": 0.3433289595745552,
+    "source_balanced_roc_auc": 0.3474025974025974,
+    "source_balanced_delta_roc_auc": 0.03896103896103903,
+    "source_balanced_pr_auc_active": 0.5618792971734148,
+    "source_balanced_delta_pr_auc_active": 0.008177060008956571,
+    "source_balanced_pr_auc_inactive": 0.5392857142857143,
+    "source_balanced_delta_pr_auc_inactive": 0.060930735930735946,
+    "source_balanced_balanced_accuracy": 0.6201298701298701,
+    "source_balanced_delta_balanced_accuracy": 0.1363636363636363,
+    "source_balanced_macro_f1": 0.6067527308838134,
+    "source_balanced_delta_macro_f1": 0.12760379471360062,
+    "source_balanced_mcc": 0.33868074965743356,
+    "source_balanced_delta_mcc": 0.37304115629463613
+  },
+  "exact_tests": [
+    {
+      "weighting": "row_weighted",
+      "metric": "roc_auc",
+      "observed_delta": 0.09523809523809523,
+      "null_mean_delta": -0.1780423280423281,
+      "null_median_delta": -0.09523809523809529,
+      "null_q025": -0.5476190476190477,
+      "null_q975": 0.11904761904761907,
+      "exact_one_sided_p": 0.14305555555555555
+    },
+    {
+      "weighting": "row_weighted",
+      "metric": "pr_auc_active",
+      "observed_delta": 0.0542328042328043,
+      "null_mean_delta": -0.05954577251452247,
+      "null_median_delta": -0.03783068783068777,
+      "null_q025": -0.19087995337995334,
+      "null_q975": 0.08201058201058209,
+      "exact_one_sided_p": 0.14027777777777778
+    },
+    {
+      "weighting": "row_weighted",
+      "metric": "pr_auc_inactive",
+      "observed_delta": 0.06241496598639451,
+      "null_mean_delta": -0.1378051820313726,
+      "null_median_delta": -0.13679138321995477,
+      "null_q025": -0.3226499690785406,
+      "null_q975": 0.08112244897959175,
+      "exact_one_sided_p": 0.1388888888888889
+    },
+    {
+      "weighting": "row_weighted",
+      "metric": "balanced_accuracy",
+      "observed_delta": 0.16666666666666663,
+      "null_mean_delta": -0.015823412698412684,
+      "null_median_delta": -0.0357142857142857,
+      "null_q025": -0.2276785714285713,
+      "null_q975": 0.23809523809523814,
+      "exact_one_sided_p": 0.059722222222222225
+    },
+    {
+      "weighting": "row_weighted",
+      "metric": "macro_f1",
+      "observed_delta": 0.15476190476190477,
+      "null_mean_delta": -0.07910450975466456,
+      "null_median_delta": -0.07417582417582413,
+      "null_q025": -0.30161502100840326,
+      "null_q975": 0.23351648351648358,
+      "exact_one_sided_p": 0.20277777777777778
+    },
+    {
+      "weighting": "row_weighted",
+      "metric": "mcc",
+      "observed_delta": 0.3433289595745552,
+      "null_mean_delta": -0.07176100587897523,
+      "null_median_delta": -0.07142857142857142,
+      "null_q025": -0.5352708026963626,
+      "null_q975": 0.4761904761904763,
+      "exact_one_sided_p": 0.059722222222222225
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "roc_auc",
+      "observed_delta": 0.03896103896103903,
+      "null_mean_delta": -0.0991747835497835,
+      "null_median_delta": -0.058441558441558406,
+      "null_q025": -0.30844155844155835,
+      "null_q975": 0.19480519480519493,
+      "exact_one_sided_p": 0.1527777777777778
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "pr_auc_active",
+      "observed_delta": 0.008177060008956571,
+      "null_mean_delta": -0.032285962397235086,
+      "null_median_delta": -0.02506688150704378,
+      "null_q025": -0.10374108720330827,
+      "null_q975": 0.13193825870331044,
+      "exact_one_sided_p": 0.12777777777777777
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "pr_auc_inactive",
+      "observed_delta": 0.060930735930735946,
+      "null_mean_delta": -0.096968903455151,
+      "null_median_delta": -0.1392857142857143,
+      "null_q025": -0.20747178747178746,
+      "null_q975": 0.07878787878787885,
+      "exact_one_sided_p": 0.13055555555555556
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "balanced_accuracy",
+      "observed_delta": 0.1363636363636363,
+      "null_mean_delta": -0.01764971139971142,
+      "null_median_delta": -0.00324675324675322,
+      "null_q025": -0.25649350649350655,
+      "null_q975": 0.1720779220779221,
+      "exact_one_sided_p": 0.059722222222222225
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "macro_f1",
+      "observed_delta": 0.12760379471360062,
+      "null_mean_delta": -0.0514769102494453,
+      "null_median_delta": -0.0635645205857972,
+      "null_q025": -0.2617576318223867,
+      "null_q975": 0.17469721767594104,
+      "exact_one_sided_p": 0.059722222222222225
+    },
+    {
+      "weighting": "source_balanced",
+      "metric": "mcc",
+      "observed_delta": 0.37304115629463613,
+      "null_mean_delta": -0.04664609823564398,
+      "null_median_delta": -0.016604312506559797,
+      "null_q025": -0.5297156681805635,
+      "null_q975": 0.44207815978730314,
+      "exact_one_sided_p": 0.059722222222222225
+    }
+  ]
+}

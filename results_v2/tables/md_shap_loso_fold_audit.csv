@@ -1,0 +1,7 @@
+fold,held_source,training_rows,testing_rows,training_sources,testing_sources,source_overlap,max_shap_additivity_error
+0,LNP193,12,1,5,1,0,1.1546319456101628e-14
+1,LNP194,12,1,5,1,0,1.1213252548714081e-14
+2,LNP195,12,1,5,1,0,7.327471962526033e-15
+3,LNP782,11,2,5,1,0,1.5654144647214707e-14
+4,LNP854,11,2,5,1,0,5.551115123125783e-16
+5,LNP858,7,6,5,1,0,6.772360450213455e-15
